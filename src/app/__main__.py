@@ -5,10 +5,7 @@ Main entry point for the cria CLI application.
 import sys
 import os
 
-# Add the current directory to the Python path so we can import cli
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-from cli import agent, tui
+from .cli import agent, tui
 
 def main():
     """The main entry point for the cria CLI application."""

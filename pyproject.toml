@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["cria*"]
+include = ["app*"]
 
 [project]
 name = "cria"
@@ -30,4 +30,4 @@ dependencies = [
 
 # This is the magic part that creates the 'cria' command!
 [project.scripts]
-cria = "cria.__main__:main"
+cria = "app.__main__:main"

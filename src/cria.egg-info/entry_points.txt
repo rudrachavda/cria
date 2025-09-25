@@ -1,2 +1,2 @@
 [console_scripts]
-cria = cria.__main__:main
+cria = app.__main__:main

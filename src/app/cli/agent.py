@@ -1,8 +1,8 @@
 
 import ollama
 import json
-from cli import tools
-from cli.tui import display_agent_thought, display_observation, get_user_input
+from . import tools
+from .tui import display_agent_thought, display_observation, get_user_input
 import inspect
 
 MODEL = 'llama3.1:latest'
