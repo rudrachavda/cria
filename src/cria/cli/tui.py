@@ -2,8 +2,8 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from prompt_toolkit import prompt
-from prompt_toolkit.shortcuts import print_formatted_text
 import os
+import re
 import subprocess
 
 # Initialize Rich Console for beautiful printing
@@ -38,7 +38,7 @@ def display_header():
 2. Be specific for the best results.
 3. Use `@path/to/file` to add file context to your message.
     """
-    console.print(Panel(tips, title="Welcome to CoderIA!", border_style="dim", expand=False))
+    console.print(Panel(tips, title="Welcome to CRIA!", border_style="dim", expand=False))
 
 def display_agent_thought(tool_name, tool_args):
     """Displays the agent's thought process in a formatted panel."""
@@ -47,21 +47,42 @@ def display_agent_thought(tool_name, tool_args):
 
 def display_observation(result):
     """Displays the result of a tool execution."""
-    # Use a simple print for observations to avoid excessive boxing
     console.print(f"[bold dim yellow]🛠️ Observation:[/bold dim yellow]\n{result}")
 
 def display_final_response(response):
     """Displays the agent's final response."""
     console.print(Panel(response, title="✅ Final Answer", border_style="green", expand=False))
 
-def get_user_input():
-    """Gets user input using prompt_toolkit with a status bar."""
-    
-    # Define the bottom toolbar content
+def parse_file_mentions(text):
+    """
+    Parses @path/to/file mentions in the text, reads the file content,
+    and appends it to the text.
+    """
+    mentions = re.findall(r'@(\S+)', text)
+    for mention in mentions:
+        try:
+            with open(mention, 'r', encoding='utf-8') as f:
+                content = f.read()
+            text += f"\n\n--- Content of {mention} ---\n{content}"
+        except FileNotFoundError:
+            text += f"\n\n--- Error: File '{mention}' not found ---"
+        except Exception as e:
+            text += f"\n\n--- Error reading file '{mention}': {e} ---"
+    return text
+
+def get_user_input(prompt_message="› "):
+    """
+    Gets user input, parses file mentions, and handles prompt_toolkit features.
+    """
     toolbar_text = f" CWD: {os.getcwd()}  {get_git_branch()} | Model: {os.getenv('CRIA_MODEL', 'llama3')} "
     
-    return prompt(
-        "› ",
+    user_text = prompt(
+        prompt_message,
         bottom_toolbar=toolbar_text,
         prompt_continuation="  "
     )
+    
+    if not user_text:
+        return None
+        
+    return parse_file_mentions(user_text)
