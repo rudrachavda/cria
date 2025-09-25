@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["cria*"]
+
+[project]
+name = "cria"
+version = "0.1.0"
+authors = [
+  { name="Your Name", email="you@example.com" },
+]
+description = "An AI-powered coding agent for your terminal."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "ollama",
+    "rich",
+    "prompt-toolkit",
+]
+
+# This is the magic part that creates the 'cria' command!
+[project.scripts]
+cria = "cria.__main__:main"

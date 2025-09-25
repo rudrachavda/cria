@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+cli/__init__.py
+cli/agent.py
+cli/tools.py
+cli/tui.py
+cria.egg-info/PKG-INFO
+cria.egg-info/SOURCES.txt
+cria.egg-info/dependency_links.txt
+cria.egg-info/entry_points.txt
+cria.egg-info/requires.txt
+cria.egg-info/top_level.txt
