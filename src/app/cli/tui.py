@@ -40,10 +40,19 @@ def display_header():
     """
     console.print(Panel(tips, title="Welcome to CRIA!", border_style="dim", expand=False))
 
-def display_agent_thought(tool_name, tool_args):
+def display_agent_thought(thought):
     """Displays the agent's thought process in a formatted panel."""
-    thought = f"[bold]Tool:[/bold] {tool_name}\n[bold]Args:[/bold] {tool_args}"
-    console.print(Panel(thought, title="🧠 Thought", border_style="yellow", expand=False))
+    if not thought:
+        return
+
+    thought_text = ""
+    if isinstance(thought, dict):
+        for key, value in thought.items():
+            thought_text += f"[bold]{key.capitalize()}:[/bold] {value}\n"
+    else:
+        thought_text = str(thought)
+
+    console.print(Panel(thought_text, title="🧠 Thought", border_style="yellow", expand=False))
 
 def display_observation(result):
     """Displays the result of a tool execution."""

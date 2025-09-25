@@ -1,0 +1,1 @@
+The code provided is a Python package for an AI-powered coding agent called 'cria'. It includes various tools and classes for analyzing user input, generating project summaries, and providing contextual suggestions. The package also includes tests to ensure the functionality of these tools.

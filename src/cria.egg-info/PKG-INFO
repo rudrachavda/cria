@@ -11,3 +11,521 @@ Description-Content-Type: text/markdown
 Requires-Dist: ollama
 Requires-Dist: rich
 Requires-Dist: prompt-toolkit
+
+# Project Analysis Summary
+
+## Project Overview
+Project Overview:
+================
+Root: /Users/rudrachavda/code/github/cria
+Files: 121 files
+Directories: 82 directories
+
+Language Distribution:
+{
+  ".py": 13,
+  ".toml": 1,
+  ".md": 1,
+  "": 88,
+  ".sample": 13,
+  ".txt": 5
+}
+
+Entry Points:
+  - pyproject.toml
+  - src/app/__main__.py
+
+Git Info:
+  Repository: Yes
+  Branch: main
+  Current Dir: /Users/rudrachavda/code/github/cria
+
+Top-level Structure:
+  📁 .git/hooks/
+  📁 .git/info/
+  📁 .git/logs/
+  📁 .git/logs/refs/
+  📁 .git/logs/refs/heads/
+  📁 .git/logs/refs/remotes/
+  📁 .git/logs/refs/remotes/origin/
+  📁 .git/objects/
+  📁 .git/objects/07/
+  📁 .git/objects/08/
+  📄 .criaignore
+  📄 .git/COMMIT_EDITMSG
+  📄 .git/HEAD
+  📄 .git/config
+  📄 .git/description
+  📄 .git/hooks/applypatch-msg.sample
+  📄 .git/hooks/commit-msg.sample
+  📄 .git/hooks/fsmonitor-watchman.sample
+  📄 .git/hooks/post-update.sample
+  📄 .git/hooks/pre-applypatch.sample
+
+## File Analysis
+
+### src/app/__init__.py
+
+**Structure:** 0 lines, 0 functions, 0 classes
+
+**Content:**
+```python
+
+```
+
+### src/app/__main__.py
+
+**Structure:** 34 lines, 1 functions, 0 classes
+
+**Functions:**
+- `main()` (line 10)
+
+**Content:**
+```python
+"""
+Main entry point for the cria CLI application.
+"""
+
+import sys
+import os
+
+from .cli import agent, tui
+
+def main():
+    """The main entry point for the cria CLI application."""
+    tui.display_header()
+    
+    # Check if a goal was passed as a command-line argument
+    if len(sys.argv) > 1:
+        goal = " ".join(sys.argv[1:])
+        tui.console.print(f"[bold]Goal:[/bold] {goal}\n")
+        agent.run_agent(goal)
+    else:
+        # Interactive mode
+        while True:
+            try:
+                goal = tui.get_user_input()
+                if goal is None or goal.lower() in ["exit", "quit"]:
+                    break
+                agent.run_agent(goal)
+            except (KeyboardInterrupt, EOFError):
+                break
+    
+    tui.console.print("\n👋 Goodbye!")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+### src/app/cli/__init__.py
+
+**Structure:** 0 lines, 0 functions, 0 classes
+
+**Content:**
+```python
+
+```
+
+### src/app/cli/agent.py
+
+**Structure:** 318 lines, 6 functions, 0 classes
+
+**Functions:**
+- `get_available_tools()` (line 12)
+- `get_system_prompt()` (line 46)
+- `get_next_action(memory)` (line 151)
+- `criticize_tool_call(action)` (line 170)
+- `execute_tool(tool_name, tool_args)` (line 208)
+- `run_agent(goal)` (line 219)
+
+**Content (first 1000 chars):**
+```python
+import ollama
+import json
+from . import tools
+from .tui import display_agent_thought, display_observation, get_user_input
+from .memory import Memory
+from .intelligence import AgentIntelligence
+import inspect
+
+MODEL = 'llama3.1:latest'
+MAX_ITERATIONS = 10
+
+def get_available_tools():
+    """
+    Returns a dictionary of available tools, mapping tool names to their functions.
+    """
+    return {
+        # Basic file operations
+        "list_files": tools.list_files,
+        "read_file": tools.read_file,
+        "read_multiple_files": tools.read_multiple_files,
+        "write_file": tools.write_file,
+        "execute_command": tools.execute_command,
+        
+        # Enhanced MCP-like tools
+        "get_project_overview": tools.get_project_overview,
+        "explore_codebase": tools.explore_codebase,
+        "analyze_file": tools.analyze_file,
+        "find_code_patterns": tools.find_code_patterns,
+        "get_file_dependencies": tools.get_file_dependencies,
+        "navigate_to_symbol":...
+```
+
+### src/app/cli/coding_workflows.py
+
+**Structure:** 390 lines, 8 functions, 1 classes
+
+**Classes:**
+- `CodingWorkflows` (line 13)
+
+**Functions:**
+- `__init__(self, context_manager)` (line 16)
+- `detect_language(self, file_path)` (line 41)
+- `find_code_smells(self, file_path)` (line 62)
+- `suggest_refactoring(self, file_path)` (line 147)
+- `generate_test_suggestions(self, file_path)` (line 197)
+- `find_security_issues(self, file_path)` (line 237)
+- `get_code_metrics(self, file_path)` (line 306)
+- `generate_documentation_suggestions(self, file_path)` (line 344)
+
+**Content (first 1000 chars):**
+```python
+"""
+Coding-specific workflows and optimizations for the cria AI agent.
+Provides specialized tools for common development tasks.
+"""
+
+import os
+import re
+import json
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Tuple
+from .context import ContextManager
+
+class CodingWorkflows:
+    """Specialized workflows for coding tasks."""
+    
+    def __init__(self, context_manager: ContextManager):
+        self.context_manager = context_manager
+        self.common_patterns = {
+            "python": {
+                "imports": r"^(import|from)\s+\w+",
+                "functions": r"^def\s+(\w+)\s*\(",
+                "classes": r"^class\s+(\w+)\s*[\(:]",
+                "docstrings": r'""".*?"""',
+                "comments": r"#.*$"
+            },
+            "javascript": {
+                "imports": r"^(import|require)\s+",
+                "functions": r"^(function\s+(\w+)|(\w+)\s*:\s*function|(\w+)\s*=>)",
+                "classes": r"^class\s+(\w+)",
+                "co...
+```
+
+### src/app/cli/context.py
+
+**Structure:** 330 lines, 13 functions, 3 classes
+
+**Classes:**
+- `CodeContext` (line 17)
+- `ProjectStructure` (line 34)
+- `ContextManager` (line 44)
+
+**Functions:**
+- `__post_init__(self)` (line 29)
+- `__init__(self, root_path)` (line 47)
+- `_load_ignore_patterns(self)` (line 54)
+- `_should_ignore(self, path)` (line 73)
+- `_build_project_structure(self)` (line 80)
+- `_get_git_info(self)` (line 119)
+- `get_project_overview(self)` (line 149)
+- `find_files_by_pattern(self, pattern, file_type)` (line 179)
+- `find_files_by_content(self, search_term, file_types)` (line 188)
+- `analyze_python_file(self, file_path)` (line 208)
+- `get_file_dependencies(self, file_path)` (line 258)
+- `get_context_around_line(self, file_path, line_num, context_lines)` (line 284)
+- `suggest_next_actions(self, current_context)` (line 307)
+
+**Content (first 1000 chars):**
+```python
+"""
+Context management system for the cria AI agent.
+Implements MCP-like capabilities for codebase understanding and navigation.
+"""
+
+import os
+import json
+import ast
+import re
+from pathlib import Path
+from typing import Dict, List, Set, Optional, Any, Tuple
+from dataclasses import dataclass, asdict
+import fnmatch
+import subprocess
+
+@dataclass
+class CodeContext:
+    """Represents a code context with metadata."""
+    file_path: str
+    line_start: int
+    line_end: int
+    content: str
+    context_type: str  # 'function', 'class', 'import', 'variable', 'comment'
+    name: Optional[str] = None
+    parent: Optional[str] = None
+    docstring: Optional[str] = None
+    dependencies: List[str] = None
+
+    def __post_init__(self):
+        if self.dependencies is None:
+            self.dependencies = []
+
+@dataclass
+class ProjectStructure:
+    """Represents the overall project structure."""
+    root_path: str
+    files: List[str]
+    directories: List[str]
+    entry_points: List[str]
+    depende...
+```
+
+### src/app/cli/enhanced_tools.py
+
+**Structure:** 361 lines, 11 functions, 1 classes
+
+**Classes:**
+- `EnhancedTools` (line 15)
+
+**Functions:**
+- `__init__(self, root_path)` (line 18)
+- `get_project_overview(self)` (line 22)
+- `explore_codebase(self, pattern, file_type, max_files)` (line 26)
+- `analyze_file(self, file_path, include_content)` (line 65)
+- `find_code_patterns(self, pattern, file_types, context_lines)` (line 122)
+- `get_file_dependencies(self, file_path)` (line 151)
+- `navigate_to_symbol(self, symbol_name, file_hint)` (line 167)
+- `get_code_flow(self, entry_point)` (line 209)
+- `suggest_improvements(self, file_path)` (line 251)
+- `get_project_health(self)` (line 286)
+- `execute_with_context(self, command, working_dir)` (line 326)
+
+**Content (first 1000 chars):**
+```python
+"""
+Enhanced tools for the cria AI agent with MCP-like capabilities.
+Provides intelligent codebase navigation and analysis.
+"""
+
+import os
+import subprocess
+import json
+import ast
+import re
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Tuple
+from .context import ContextManager
+
+class EnhancedTools:
+    """Enhanced tools with MCP-like capabilities for codebase understanding."""
+    
+    def __init__(self, root_path: str = "."):
+        self.context_manager = ContextManager(root_path)
+        self.current_working_dir = Path.cwd()
+    
+    def get_project_overview(self) -> str:
+        """Get a comprehensive overview of the current project."""
+        return self.context_manager.get_project_overview()
+    
+    def explore_codebase(self, pattern: str = "*", file_type: str = None, max_files: int = 20) -> str:
+        """
+        Explore the codebase with intelligent filtering and analysis.
+        
+        Args:
+            pattern: Glob pattern to match files
+     ...
+```
+
+### src/app/cli/intelligence.py
+
+**Structure:** 366 lines, 8 functions, 1 classes
+
+**Classes:**
+- `AgentIntelligence` (line 11)
+
+**Functions:**
+- `__init__(self)` (line 14)
+- `analyze_user_intent(self, user_goal)` (line 19)
+- `suggest_next_tool(self, current_context, available_tools, previous_actions)` (line 81)
+- `extract_key_terms(self, text)` (line 123)
+- `generate_smart_plan(self, user_goal, project_context)` (line 139)
+- `should_continue(self, current_observation, iteration, max_iterations)` (line 250)
+- `learn_from_interaction(self, user_goal, actions_taken, final_result, success)` (line 298)
+- `get_contextual_suggestions(self, current_state)` (line 325)
+
+**Content (first 1000 chars):**
+```python
+"""
+Intelligence and reasoning capabilities for the cria AI agent.
+Provides smart decision-making and context-aware tool selection.
+"""
+
+import re
+import json
+from typing import Dict, List, Any, Optional, Tuple
+from pathlib import Path
+
+class AgentIntelligence:
+    """Intelligent reasoning and decision-making for the agent."""
+    
+    def __init__(self):
+        self.context_history = []
+        self.learned_patterns = {}
+        self.project_insights = {}
+    
+    def analyze_user_intent(self, user_goal: str) -> Dict[str, Any]:
+        """
+        Analyze user intent and suggest optimal approach.
+        
+        Args:
+            user_goal: The user's stated goal
+            
+        Returns:
+            Dict containing analysis and recommendations
+        """
+        intent_analysis = {
+            "intent_type": "unknown",
+            "complexity": "medium",
+            "suggested_tools": [],
+            "approach": "exploratory",
+            "confidence": 0.5
+        }
+        
+ ...
+```
+
+### src/app/cli/memory.py
+
+**Structure:** 32 lines, 3 functions, 1 classes
+
+**Classes:**
+- `Memory` (line 7)
+
+**Functions:**
+- `__init__(self)` (line 12)
+- `add_message(self, role, content)` (line 15)
+- `get_history(self)` (line 25)
+
+**Content:**
+```python
+"""
+Memory for the cria AI agent.
+"""
+
+from typing import List, Dict
+
+class Memory:
+    """
+    A class to store the conversation history.
+    """
+
+    def __init__(self):
+        self.history: List[Dict[str, str]] = []
+
+    def add_message(self, role: str, content: str):
+        """
+        Adds a message to the conversation history.
+
+        Args:
+            role (str): The role of the message sender (e.g., "user", "assistant").
+            content (str): The content of the message.
+        """
+        self.history.append({"role": role, "content": content})
+
+    def get_history(self) -> List[Dict[str, str]]:
+        """
+        Returns the conversation history.
+
+        Returns:
+            List[Dict[str, str]]: The conversation history.
+        """
+        return self.history
+
+```
+
+### src/app/cli/tools.py
+
+**Structure:** 518 lines, 25 functions, 0 classes
+
+**Functions:**
+- `get_enhanced_tools()` (line 17)
+- `get_coding_workflows()` (line 24)
+- `get_ignore_patterns()` (line 28)
+- `list_files(path, recursive)` (line 41)
+- `read_file(path)` (line 80)
+- `read_multiple_files(paths)` (line 99)
+- `write_file(path, content)` (line 122)
+- `execute_command(command)` (line 146)
+- `get_project_overview()` (line 179)
+- `explore_codebase(pattern, file_type, max_files)` (line 188)
+- `analyze_file(file_path, include_content)` (line 202)
+- `find_code_patterns(pattern, file_types, context_lines)` (line 215)
+- `get_file_dependencies(file_path)` (line 229)
+- `navigate_to_symbol(symbol_name, file_hint)` (line 241)
+- `get_code_flow(entry_point)` (line 254)
+- `suggest_improvements(file_path)` (line 266)
+- `get_project_health()` (line 278)
+- `execute_with_context(command, working_dir)` (line 287)
+- `find_code_smells(file_path)` (line 301)
+- `suggest_refactoring(file_path)` (line 327)
+- `generate_test_suggestions(file_path)` (line 353)
+- `find_security_issues(file_path)` (line 379)
+- `get_code_metrics(file_path)` (line 405)
+- `generate_documentation_suggestions(file_path)` (line 432)
+- `read_and_summarize_project()` (line 458)
+
+**Content (first 1000 chars):**
+```python
+"""
+Tools for the cria AI agent with MCP-like capabilities.
+"""
+
+import os
+import subprocess
+from pathlib import Path
+from typing import List, Dict, Any
+import fnmatch
+from contextlib import suppress
+from .enhanced_tools import EnhancedTools
+from .coding_workflows import CodingWorkflows
+
+# Initialize enhanced tools
+_enhanced_tools = None
+
+def get_enhanced_tools():
+    """Get or create the enhanced tools instance."""
+    global _enhanced_tools
+    if _enhanced_tools is None:
+        _enhanced_tools = EnhancedTools()
+    return _enhanced_tools
+
+def get_coding_workflows():
+    """Get or create the coding workflows instance."""
+    return CodingWorkflows(get_enhanced_tools().context_manager)
+
+def get_ignore_patterns():
+    """
+    Reads the .criaignore file and returns a list of glob patterns.
+    """
+    ignore_patterns = []
+    with suppress(FileNotFoundError):
+        with open('.criaignore', 'r') as f:
+            for line in f:
+                line = line.strip()
+                if li...
+```
+
+
+*... and 1 more files*

@@ -4,6 +4,11 @@ src/app/__init__.py
 src/app/__main__.py
 src/app/cli/__init__.py
 src/app/cli/agent.py
+src/app/cli/coding_workflows.py
+src/app/cli/context.py
+src/app/cli/enhanced_tools.py
+src/app/cli/intelligence.py
+src/app/cli/memory.py
 src/app/cli/tools.py
 src/app/cli/tui.py
 src/cria.egg-info/PKG-INFO
